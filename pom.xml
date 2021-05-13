@@ -33,9 +33,31 @@
     </repositories>
 
     <properties>
-        <package-name>AutoROIKymograph</package-name>
-        <main-class>AutoROIKymograph.Test_</main-class>
+        <package-name>AutoROIKymograph_</package-name>
+        <main-class>AutoROIKymograph_</main-class>
     </properties>
+
+    <build>
+        <sourceDirectory>AutoROIKymograph_</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>AutoROIKymograph_</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>4.0.0</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <!-- ImageJ dependencies -->
