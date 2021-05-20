@@ -19,8 +19,8 @@ public class Range<E extends Number>{
 
     public Range(Range<E> range){
 
-        this.min = range.min;
-        this.max = range.max;
+        this.min = range.getMin();
+        this.max = range.getMax();
     }
 
         /**********
@@ -52,11 +52,11 @@ public class Range<E extends Number>{
          ******************/
     public boolean belongToItself(int value){
 
-        return ((min.intValue() <= value) && (value <= max.intValue()));
+        return ((this.min.intValue() <= value) && (value <= this.max.intValue()));
     }
 
     public boolean belongToItself(double value){
 
-        return ((min.doubleValue() <= value) && (value <= max.doubleValue()));
+        return ((this.min.doubleValue() <= value) && (value <= this.max.doubleValue()));
     }
 }

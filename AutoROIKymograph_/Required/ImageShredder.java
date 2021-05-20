@@ -13,17 +13,16 @@ public class ImageShredder extends Thread{
         /*************
          * Variables *
          *************/
-    private final ImagePlus image;              // Image to process
-    private final Range<Double> intensity;      // Intensity range of valid pixels
-    private final int searchLength;             // Length (in px) of search on the next line of pixel
-    private final int subSearchLgth;            // sub length (in px) for detecting group
-    private final ImageInfo imageInfo;          // Image information
-    private final RoiManager roiManager;        // Window ROI
-    private final float[] pixels;               // Image pixel array
-    private final ArrayList<Point> startPoints; // Preselected points
-    private ConcurrentLinkedQueue<Point> toBeProcess;           //
-
-    private ArrayList<Graph<Point>> finalPaths;   // All detected points for drawing final paths
+    private final ImagePlus image;                      // Image to process
+    private final Range<Double> intensity;              // Intensity range of valid pixels
+    private final int searchLength;                     // Length (in px) of search on the next line of pixel
+    private final int subSearchLgth;                    // sub length (in px) for detecting group
+    private final ImageInfo imageInfo;                  // Image information
+    private final RoiManager roiManager;                // Window ROI
+    private final float[] pixels;                       // Image pixel array
+    private final ArrayList<Point> startPoints;         // Preselected points
+    private ConcurrentLinkedQueue<Point> toBeProcess;   // Points that need processing
+    private ArrayList<Graph<Point>> finalPaths;         // All detected points for drawing final paths
 
         /***************
          * Constructor *
@@ -70,12 +69,8 @@ public class ImageShredder extends Thread{
 
         System.out.println("Start image process");
         this.finalPaths = new ArrayList<>();
-        for (Point startPoint : this.startPoints) {
+        for(Point startPoint : this.startPoints){
 
-            System.out.println("Start pt pixel value: " + pixels[startPoint.x + startPoint.y * this.imageInfo.width]);
-            System.out.println("Range: " + intensity.getMin() + " / " + intensity.getMax());
-            System.out.println("Lengths: " + searchLength + " / " + subSearchLgth);
-            System.out.println();
             Graph<Point> tmp = new Graph<>(startPoint);
             this.finalPaths.add(tmp);
         }
@@ -119,11 +114,11 @@ public class ImageShredder extends Thread{
 
         processSubLine(point.current, minX, maxX, point.y + 1);
 
-        if(point.current.hasChildren() && (point.y < imageInfo.height - 1)){
+        if(point.current.hasChildren() && (point.y < this.imageInfo.height - 1)){
 
             for(Node<Point> child : point.current.getChildren()){
 
-                toBeProcess.offer(new Point(child.getValue().x, child.getValue().y, child));
+                this.toBeProcess.offer(new Point(child.getValue().x, child.getValue().y, child));
             }
         }
     }
@@ -145,7 +140,7 @@ public class ImageShredder extends Thread{
                 }
                 else{
 
-                    if((k - tmp.get(tmp.size() - 1).x) > subSearchLgth){
+                    if((k - tmp.get(tmp.size() - 1).x) > this.subSearchLgth){
 
                         Point tmpP = new Point(k, y, null);
                         tmp.add(tmpP);

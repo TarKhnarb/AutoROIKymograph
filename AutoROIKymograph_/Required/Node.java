@@ -195,7 +195,6 @@ public class Node<E>{
     public int hashCode(){
 
         int result = (this.parent != null ? this.parent.hashCode() : 0);
-
         result = 31 * result + (this.children != null ? this.children.hashCode() : 0);
         result = 31 * result + (this.value != null ? this.value.hashCode() : 0);
 

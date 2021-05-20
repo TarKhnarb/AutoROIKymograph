@@ -10,6 +10,9 @@ import ij.process.ImageProcessor;
 
 public class PresetKymograph implements PlugInFilter{
 
+        /*********
+         * SetUp *
+         *********/
     @Override
     public int setup(String s, ImagePlus imagePlus) {
 
@@ -34,6 +37,9 @@ public class PresetKymograph implements PlugInFilter{
         return DOES_8C;
     }
 
+        /*******
+         * Run *
+         *******/
     @Override
     public void run(ImageProcessor imageProcessor) {
 

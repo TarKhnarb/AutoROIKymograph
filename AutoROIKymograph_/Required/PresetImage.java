@@ -14,9 +14,15 @@ import java.io.File;
 
 public class PresetImage implements PlugIn{
 
+        /*************
+         * Variables *
+         *************/
     private ImagePlus image;
     private static File dir;
 
+        /*******
+         * Run *
+         *******/
     @Override
     public void run(String s){
 
@@ -63,10 +69,10 @@ public class PresetImage implements PlugIn{
                 fc.setMultiSelectionEnabled(true);
                 if(dir == null){
 
-                    String sdir = OpenDialog.getDefaultDirectory();
-                    if(sdir != null){
+                    String subDir = OpenDialog.getDefaultDirectory();
+                    if(subDir != null){
 
-                        dir = new File(sdir);
+                        dir = new File(subDir);
                     }
                 }
 
@@ -122,6 +128,9 @@ public class PresetImage implements PlugIn{
         }
     }
 
+        /************
+         * GetImage *
+         ************/
     public ImagePlus getImage(){
 
         return this.image;

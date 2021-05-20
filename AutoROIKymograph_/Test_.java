@@ -41,7 +41,7 @@ public class Test_ implements PlugInFilter{
             this.image = WindowManager.getCurrentImage();
         }
 
-        imageInfo = new ImageInfo(image);
+        this.imageInfo = new ImageInfo(image);
         this.roiManager = RoiManager.getInstance(); // ROI manager required
         if(this.roiManager == null){
 
@@ -49,9 +49,9 @@ public class Test_ implements PlugInFilter{
             return;
         }
 
-        Roi[] tempRoi = roiManager.getRoisAsArray();
+        Roi[] tempRoi = this.roiManager.getRoisAsArray();
         int count = 0;
-        for(int i = 0; i < roiManager.getCount(); ++i){
+        for(int i = 0; i < this.roiManager.getCount(); ++i){
 
             if(tempRoi[i].getType() == Roi.POINT){
 
@@ -72,18 +72,16 @@ public class Test_ implements PlugInFilter{
         dialog.addSlider("Max value", 0.0, 255.0, 150.0, 0.1);
 
         dialog.addMessage("Please set the maximal speed of a particle");
-        dialog.addSlider("Search length (px)", 1.0, imageInfo.width, 30, 1.0);
-        dialog.addSlider("Minimal length between two found points", 2.0, searchLength, 2.0, 1.0);
+        dialog.addSlider("Search length (px)", 1.0, this.imageInfo.width, 30, 1.0);
+        dialog.addSlider("Minimal length between two found points", 2.0, this.searchLength, 2.0, 1.0);
 
         dialog.addMessage("Image to be process");
-        dialog.addImage(image);
+        dialog.addImage(this.image);
 
         dialog.addMessage("Image information:");
-        dialog.addMessage("     Number of frames: " + imageInfo.nbFrames);
-        dialog.addMessage("     Image width (px): " + imageInfo.width);
-        dialog.addMessage("     Image height (px): " + imageInfo.height);
-        dialog.addMessage("     Image Type (int): " + imageInfo.type);
-
+        dialog.addMessage("     Number of frames: " + this.imageInfo.nbFrames);
+        dialog.addMessage("     Image width (px): " + this.imageInfo.width);
+        dialog.addMessage("     Image height (px): " + this.imageInfo.height);
 
         dialog.showDialog();
 

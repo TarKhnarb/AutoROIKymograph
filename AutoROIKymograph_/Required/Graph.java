@@ -66,7 +66,6 @@ public class Graph<E>{
 
         ArrayList<ArrayList<Node<E>>> all = new ArrayList<>();
         ArrayList<Node<E>> path = new ArrayList<>();
-
         getPath(this.root, path, all);
 
         return all;
@@ -83,8 +82,7 @@ public class Graph<E>{
             return;
         }
 
-        path.add(node); // Add current node to the path
-
+        path.add(node);             // Add current node to the path
         if(!node.hasChildren()){    // The current node is a leaf
 
             paths.add(clone(path));
@@ -109,7 +107,6 @@ public class Graph<E>{
     private ArrayList<Node<E>> clone(ArrayList<Node<E>> path){
 
         ArrayList<Node<E>> toReturn = new ArrayList<>();
-
         for(Node<E> n : path){
 
             toReturn.add(new Node<>(n));

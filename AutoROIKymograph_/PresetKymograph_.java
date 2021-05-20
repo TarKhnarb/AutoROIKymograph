@@ -1,4 +1,3 @@
-
 import Required.PresetKymograph;
 
 import ij.IJ;
@@ -11,12 +10,17 @@ import javax.swing.*;
 
 public class PresetKymograph_ extends PlugInFrame{
 
+        /*************
+         * Variables *
+         *************/
     protected ImagePlus imageRef;
-    private JPanel panel;
     private JButton buttonAdd;
     private JButton buttonQuit;
     private boolean OK;
 
+        /***************
+         * Constructor *
+         ***************/
     public PresetKymograph_(){
 
         super("PresetKymograph");
@@ -27,6 +31,7 @@ public class PresetKymograph_ extends PlugInFrame{
 
             IJ.error("PresetKymograph_", "Minimal version allowed is 1.52i");
             this.OK = false;
+
             return;
         }
 
@@ -34,6 +39,7 @@ public class PresetKymograph_ extends PlugInFrame{
 
             IJ.error("PresetKymograph_","You should have at least one image open");
             this.OK = false;
+
             return;
         }
 
@@ -41,6 +47,7 @@ public class PresetKymograph_ extends PlugInFrame{
 
             IJ.error("PresetKymograph_", "The image should be have a Grey 32bits preset");
             this.OK = false;
+
             return;
         }
 
@@ -54,11 +61,14 @@ public class PresetKymograph_ extends PlugInFrame{
         this.run("");
     }
 
+        /**************
+         * LoadPanels *
+         **************/
     private void loadPanels(){
 
-        buttonAdd.addActionListener(action -> {
+        this.buttonAdd.addActionListener(action -> {
 
-            if(buttonAdd.isEnabled()){
+            if(this.buttonAdd.isEnabled()){
 
                 this.imageRef = WindowManager.getCurrentImage();
                 new PresetKymograph().run(this.imageRef.getProcessor());
@@ -66,24 +76,27 @@ public class PresetKymograph_ extends PlugInFrame{
             }
         });
 
-        buttonQuit.addActionListener(action -> {
+        this.buttonQuit.addActionListener(action -> {
 
-            if(buttonQuit.isEnabled()){
+            if(this.buttonQuit.isEnabled()){
 
                 this.dispose();
             }
         });
 
-        this.panel = new JPanel();
-        this.panel.add(new JLabel("Remember to save (Ctrl+S after selecting the image window) each intermediate image if you wish to use them as an operator."));
-        this.panel.add(new JLabel("Note this plugin doesn't replace the module Image>Adjust>Brightness/Contrast... (Ctrl+MAJ+C),  you can using both of them."));
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Remember to save (Ctrl+S after selecting the image window) each intermediate image if you wish to use them as an operator."));
+        panel.add(new JLabel("Note this plugin doesn't replace the module Image>Adjust>Brightness/Contrast... (Ctrl+MAJ+C),  you can using both of them."));
         JPanel tmp = new JPanel();
         tmp.add(this.buttonAdd);
         tmp.add(this.buttonQuit);
-        this.panel.add(tmp);
-        this.add(this.panel);
+        panel.add(tmp);
+        this.add(panel);
     }
 
+        /*******
+         * Run *
+         *******/
     public void run(String arg){
 
         if(this.OK){

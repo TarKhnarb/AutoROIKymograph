@@ -5,6 +5,9 @@ import ij.process.ImageProcessor;
 
 public class ImageOperators{
 
+        /*************************
+         * Enumeration: Operator *
+         *************************/
     public enum Operator{
 
         Reverse,
@@ -30,6 +33,9 @@ public class ImageOperators{
         All
     }
 
+        /*****************
+         * ApplyOperator *
+         *****************/
     public ImagePlus applyOperator(Operator op, ImagePlus base, double value){
 
         switch(op){
@@ -121,11 +127,14 @@ public class ImageOperators{
             case Difference:
                 return operatorDifference(base.duplicate().getProcessor(), processI.getProcessor());
 
-            default: case None: case All: case Reverse: case AND: case OR: case XOR: case Log2:case Logarithm: case Exponential: case SquareRoot: case Gamma: case Absolute: case Square:
+            default: case None: case All: case Reverse: case AND: case OR: case XOR: case Log2: case Logarithm: case Exponential: case SquareRoot: case Gamma: case Absolute: case Square:
                 return base;
         }
     }
 
+        /***************
+         * OperatorRev *
+         ***************/
     private ImagePlus operatorRev(ImageProcessor image){
 
         image.invert();
@@ -133,6 +142,9 @@ public class ImageOperators{
         return new ImagePlus("rev", image);
     }
 
+        /***************
+         * OperatorAdd *
+         ***************/
     private ImagePlus operatorAdd(ImageProcessor image, double value){
 
         image.add(value);
@@ -162,9 +174,13 @@ public class ImageOperators{
         }
 
         image.setFloatArray(base);
+
         return new ImagePlus("add_Image", image);
     }
 
+        /***************
+         * OperatorSub *
+         ***************/
     private ImagePlus operatorSub(ImageProcessor image, double value){
 
         image.subtract(value);
@@ -194,9 +210,13 @@ public class ImageOperators{
         }
 
         image.setFloatArray(base);
+
         return new ImagePlus("sub_Image", image);
     }
 
+        /****************
+         * OperatorMult *
+         ****************/
     private ImagePlus operatorMult(ImageProcessor image, double value){
 
         image.multiply(value);
@@ -226,9 +246,13 @@ public class ImageOperators{
         }
 
         image.setFloatArray(base);
+
         return new ImagePlus("mult_Image", image);
     }
 
+        /***************
+         * OperatorDiv *
+         ***************/
     private ImagePlus operatorDiv(ImageProcessor image, double value){
 
         if(value == 0.0){
@@ -267,6 +291,9 @@ public class ImageOperators{
         return new ImagePlus("div_Image", image);
     }
 
+        /***************
+         * OperatorMin *
+         ***************/
     private ImagePlus operatorMin(ImageProcessor image, double value){
 
         image.min(value);
@@ -292,6 +319,9 @@ public class ImageOperators{
         return new ImagePlus("min_Image", image);
     }
 
+        /***************
+         * OperatorMax *
+         ***************/
     private ImagePlus operatorMax(ImageProcessor image, double value){
 
         image.max(value);
@@ -317,6 +347,9 @@ public class ImageOperators{
         return new ImagePlus("max_Image", image);
     }
 
+        /***************
+         * OperatorAnd *
+         ***************/
     private ImagePlus operatorAnd(ImageProcessor image, int value){
 
         image.and(value);
@@ -324,6 +357,9 @@ public class ImageOperators{
         return new ImagePlus("AND_" + value, image);
     }
 
+        /**************
+         * OperatorOr *
+         **************/
     private ImagePlus operatorOr(ImageProcessor image, int value){
 
         image.or(value);
@@ -331,6 +367,9 @@ public class ImageOperators{
         return new ImagePlus("OR_" + value, image);
     }
 
+        /***************
+         * OperatorXor *
+         ***************/
     private ImagePlus operatorXor(ImageProcessor image, int value){
 
         image.xor(value);
@@ -338,6 +377,9 @@ public class ImageOperators{
         return new ImagePlus("XOR_" + value, image);
     }
 
+        /*****************
+         * OperatorGamma *
+         *****************/
     private ImagePlus operatorGamma(ImageProcessor image, double value){
 
         image.gamma(value);
@@ -345,6 +387,9 @@ public class ImageOperators{
         return new ImagePlus("gamma_" + value, image);
     }
 
+        /***************
+         * OperatorLog *
+         ***************/
     private ImagePlus operatorLog(ImageProcessor image){
 
         image.log();
@@ -352,6 +397,9 @@ public class ImageOperators{
         return new ImagePlus("log2", image);
     }
 
+        /**************
+         * OperatorLn *
+         **************/
     private ImagePlus operatorLn(ImageProcessor image){
 
         image.ln();
@@ -359,6 +407,9 @@ public class ImageOperators{
         return new ImagePlus("ln", image);
     }
 
+        /***************
+         * OperatorExp *
+         ***************/
     private ImagePlus operatorExp(ImageProcessor image){
 
         image.exp();
@@ -366,6 +417,9 @@ public class ImageOperators{
         return new ImagePlus("exp", image);
     }
 
+        /***************
+         * OperatorSqr *
+         ***************/
     private ImagePlus operatorSqr(ImageProcessor image){
 
         image.sqr();
@@ -373,6 +427,9 @@ public class ImageOperators{
         return new ImagePlus("sqr", image);
     }
 
+        /****************
+         * OperatorSqrt *
+         ****************/
     private ImagePlus operatorSqrt(ImageProcessor image){
 
         image.sqrt();
@@ -380,6 +437,9 @@ public class ImageOperators{
         return new ImagePlus("sqrt", image);
     }
 
+        /***************
+         * OperatorAbs *
+         ***************/
     private ImagePlus operatorAbs(ImageProcessor image){
 
         image.abs();
@@ -387,9 +447,13 @@ public class ImageOperators{
         return new ImagePlus("Log", image);
     }
 
+        /*******************
+         * OperatorAverage *
+         *******************/
     private ImagePlus operatorAverage(ImageProcessor image, float value){
 
         float[][] base = image.getFloatArray();
+
         for(int j = 0; j < base.length; ++j){
 
             for(int i = 0; i < base[0].length; ++i){
@@ -437,6 +501,9 @@ public class ImageOperators{
         return new ImagePlus("aver_Image", image);
     }
 
+        /**********************
+        * OperatorDifference *
+         **********************/
     private ImagePlus operatorDifference(ImageProcessor image, ImageProcessor processor){
 
         float[][] base = image.getFloatArray();
