@@ -2,6 +2,7 @@ import Required.Graph;
 import Required.ImageInfo;
 import Required.ImageShredder;
 import Required.Node;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.Prefs;
@@ -13,7 +14,6 @@ import ij.plugin.filter.PlugInFilter;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 public class Test_ implements PlugInFilter{
@@ -27,8 +27,8 @@ public class Test_ implements PlugInFilter{
     private ImageInfo imageInfo = null;
     private double minValue = Prefs.get("AutoROI_minVal.double", 50.0);                 // Minimal intensity value of the pixel
     private double maxValue = Prefs.get("AutoROI_maxVal.double", 150.0);                // Maximal intensity value of the pixel
-    private int searchLength = (int) Prefs.get("AutoROI_searchLgt.double", 30.0);       // Maximal intensity value of the pixel
-    private int subSearchLength = (int) Prefs.get("AutoROI_subSearchLgt.double", 2.0);  // Maximal intensity value of the pixel
+    private int searchLength = (int) Prefs.get("AutoROI_searchLgt.double", 30.0);       // Length of search on the next line
+    private int subSearchLength = (int) Prefs.get("AutoROI_subSearchLgt.double", 2.0);  // Minimal length (in px) between two higher pixel value
 
         /*******
          * Run *
@@ -73,7 +73,7 @@ public class Test_ implements PlugInFilter{
 
         dialog.addMessage("Please set the maximal speed of a particle");
         dialog.addSlider("Search length (px)", 1.0, imageInfo.width, 30, 1.0);
-        dialog.addSlider("Sub-search length", 2.0, searchLength, 2.0, 1.0);
+        dialog.addSlider("Minimal length between two found points", 2.0, searchLength, 2.0, 1.0);
 
         dialog.addMessage("Image to be process");
         dialog.addImage(image);
@@ -122,40 +122,31 @@ public class Test_ implements PlugInFilter{
         }
     }
 
-
         /******************
          * ProcessResults *
          ******************/
-    private void processResults(ArrayList<Graph<Polygon>> graphs){
+    private void processResults(ArrayList<Graph<Required.Point>> graphs){
 
         this.roiManager.reset();
-        for(Graph<Polygon> graph : graphs){
+        for(Graph<Required.Point> graph : graphs){
 
-            //System.out.println("Ceci est un nouvel arbre");
-            for(ArrayList<Node<Polygon>> path : graph.getAllPaths()){
+            for(ArrayList<Node<Required.Point>> path : graph.getAllPaths()){
 
                 this.roiManager.addRoi(new PolygonRoi(getXCoordinates(path), getYCoordinates(path), path.size(), Roi.POLYLINE));
-                /*
-                for(Node<Polygon> point : path){
-
-                    System.out.println("    x: " + point.getValue().xpoints[0] + " / y: " + point.getValue().ypoints[0]);
-                }
-                */
             }
         }
     }
 
-
         /*******************
          * GetXCoordinates *
          *******************/
-    private int[] getXCoordinates(ArrayList<Node<Polygon>> path){
+    private int[] getXCoordinates(ArrayList<Node<Required.Point>> path){
 
         int[] toReturn = new int[path.size()];
 
         for(int i = 0; i < path.size(); ++i){
 
-            toReturn[i] = path.get(i).getValue().xpoints[0];
+            toReturn[i] = path.get(i).getValue().x;
         }
 
         return toReturn;
@@ -164,14 +155,14 @@ public class Test_ implements PlugInFilter{
         /*******************
          * GetYCoordinates *
          *******************/
-    private int[] getYCoordinates(ArrayList<Node<Polygon>> path){
+    private int[] getYCoordinates(ArrayList<Node<Required.Point>> path){
 
 
         int[] toReturn = new int[path.size()];
 
         for(int i = 0; i < path.size(); ++i){
 
-            toReturn[i] = path.get(i).getValue().ypoints[0];
+            toReturn[i] = path.get(i).getValue().y;
         }
 
         return toReturn;
