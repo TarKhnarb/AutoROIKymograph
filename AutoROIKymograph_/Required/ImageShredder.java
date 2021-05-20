@@ -5,24 +5,25 @@ import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.plugin.frame.RoiManager;
 
-import java.awt.Polygon;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ImageShredder {
+public class ImageShredder extends Thread{
 
-    /*************
-     * Variables *
-     *************/
-    private final ImagePlus image;                  // Image to process
-    private final Range<Double> intensity;          // Intensity range of valid pixels
-    private final int searchLength;                 // Length (in px) of search on the next line of pixel
-    private final int subSearchLgth;                // sub length (in px) for detecting group
-    private final ImageInfo imageInfo;              // Image information
-    private final RoiManager roiManager;            // Window ROI
-    private final float[] pixels;                   // Image pixel array
-    private final ArrayList<Polygon> startPoints;   // Preselected points
+        /*************
+         * Variables *
+         *************/
+    private final ImagePlus image;              // Image to process
+    private final Range<Double> intensity;      // Intensity range of valid pixels
+    private final int searchLength;             // Length (in px) of search on the next line of pixel
+    private final int subSearchLgth;            // sub length (in px) for detecting group
+    private final ImageInfo imageInfo;          // Image information
+    private final RoiManager roiManager;        // Window ROI
+    private final float[] pixels;               // Image pixel array
+    private final ArrayList<Point> startPoints; // Preselected points
+    private ConcurrentLinkedQueue<Point> toBeProcess;           //
 
-    private ArrayList<Graph<Polygon>> finalPaths;   // All detected points for drawing final paths
+    private ArrayList<Graph<Point>> finalPaths;   // All detected points for drawing final paths
 
         /***************
          * Constructor *
@@ -36,8 +37,9 @@ public class ImageShredder {
         this.imageInfo = imageInfo;
         this.roiManager = roiManager;
         this.pixels = (float[]) this.image.getProcessor().getPixels();
-
+        this.toBeProcess = new ConcurrentLinkedQueue<>();
         this.startPoints = new ArrayList<>();
+
         getStartingPoints();
     }
 
@@ -51,7 +53,7 @@ public class ImageShredder {
 
             if((points.getType() == Roi.POINT) && (points.getPolygon().npoints != 0)){
 
-                this.startPoints.add(points.getPolygon());
+                this.startPoints.add(new Point(points.getPolygon().xpoints[0], points.getPolygon().ypoints[0], null));
             }
         }
 
@@ -68,13 +70,13 @@ public class ImageShredder {
 
         System.out.println("Start image process");
         this.finalPaths = new ArrayList<>();
-        for (Polygon startPoint : this.startPoints) {
+        for (Point startPoint : this.startPoints) {
 
-            System.out.println("Start pt pixel value: " + pixels[startPoint.xpoints[0] + startPoint.ypoints[0] * this.imageInfo.width]);
+            System.out.println("Start pt pixel value: " + pixels[startPoint.x + startPoint.y * this.imageInfo.width]);
             System.out.println("Range: " + intensity.getMin() + " / " + intensity.getMax());
             System.out.println("Lengths: " + searchLength + " / " + subSearchLgth);
             System.out.println();
-            Graph<Polygon> tmp = new Graph<>(startPoint);
+            Graph<Point> tmp = new Graph<>(startPoint);
             this.finalPaths.add(tmp);
         }
 
@@ -87,7 +89,7 @@ public class ImageShredder {
         /*****************
          * GetFinalPaths *
          *****************/
-    public ArrayList<Graph<Polygon>> getFinalPaths(){
+    public ArrayList<Graph<Point>> getFinalPaths(){
 
         return this.finalPaths;
     }
@@ -97,77 +99,74 @@ public class ImageShredder {
          *********************/
     private void processStartPoint(int index){
 
-        int startX = this.finalPaths.get(index).getRoot().getValue().xpoints[0];
-        int startY = this.finalPaths.get(index).getRoot().getValue().ypoints[0];
+        this.toBeProcess.add(new Point(this.finalPaths.get(index).getRoot().getValue().x, this.finalPaths.get(index).getRoot().getValue().y, this.finalPaths.get(index).getRoot()));
 
-        processLine(this.finalPaths.get(index).getRoot(), startX, ++startY);
+        Point toProcess;
+        while((toProcess = this.toBeProcess.poll()) != null){
+
+            processLine(toProcess);
+        }
     }
 
         /***************
          * ProcessLine *
          ***************/
-    private void processLine(Node<Polygon> currentNode, int x, int y){
+    private void processLine(Point point){
 
-        System.out.println("Process line n°" + y);
         int tmpLgth = (this.searchLength + (this.searchLength%2))/2;
-        int minX = (Math.max((x - tmpLgth), 0));
-        int maxX = (Math.min((x + tmpLgth), this.imageInfo.width - 1));
+        int minX = (Math.max((point.x - tmpLgth), 0));
+        int maxX = (Math.min((point.x + tmpLgth), this.imageInfo.width - 1));
 
-        for(int k = minX; k < maxX; k += subSearchLgth){
+        processSubLine(point.current, minX, maxX, point.y + 1);
 
-            processSubLine(currentNode, k, y);
-        }
+        if(point.current.hasChildren() && (point.y < imageInfo.height - 1)){
 
-        if(currentNode.hasChildren() && (y < imageInfo.height - 2)){
+            for(Node<Point> child : point.current.getChildren()){
 
-            for(Node<Polygon> child : currentNode.getChildren()){
-
-                processLine(child, child.getValue().xpoints[0], ++y);
+                toBeProcess.offer(new Point(child.getValue().x, child.getValue().y, child));
             }
         }
     }
-
         /******************
          * ProcessSubLine *
          ******************/
-    private void processSubLine(Node<Polygon> node, int x, int y){
+    private void processSubLine(Node<Point> node, int minX, int maxX, int y){
 
-        int tmp = -1;
-        for(int k = x; k < x + this.subSearchLgth; ++k){
+        ArrayList<Point> tmp = new ArrayList<>();
+        for(int k = minX; k < maxX; ++k){
 
-            System.out.print("          Pixel process: " + k + " / " + y);
             double value = this.pixels[k + y*this.imageInfo.width];
             if(this.intensity.belongToItself(value)){
 
-                System.out.print(" OUI: " + value + "\n");
-                if(tmp == -1){
+                if(tmp.isEmpty()){
 
-                    tmp = k;
+                    Point tmpP = new Point(k, y, null);
+                    tmp.add(tmpP);
                 }
                 else{
 
-                    if(this.pixels[tmp + y*this.imageInfo.width] < value){
+                    if((k - tmp.get(tmp.size() - 1).x) > subSearchLgth){
 
-                        tmp = k;
+                        Point tmpP = new Point(k, y, null);
+                        tmp.add(tmpP);
+                    }
+                    else if(this.pixels[tmp.get(tmp.size() - 1).x + y*this.imageInfo.width] < value){
+
+                        Point tmpP = new Point(k, y, null);
+                        tmp.set(tmp.size() - 1, tmpP);
                     }
                 }
             }
-            else{
+        }
 
-                System.out.print(" NON: " + value + "\n");
+        if(!tmp.isEmpty()){
+
+            for(Point p : tmp){
+
+                Node<Point> n = new Node<>(p);
+                n.getValue().setCurrent(n);
+                node.addchild(n);
             }
-        }
-
-        if(tmp != -1){
-
-            System.out.println("      Trouvé : " + tmp + " / " + y );
-            Polygon tmpPoly = new Polygon();
-            tmpPoly.addPoint(tmp, y);
-            node.addchild(new Node<>(tmpPoly));
-        }
-        else{
-
-            System.out.println("      Rien trouvé");
         }
     }
 }
