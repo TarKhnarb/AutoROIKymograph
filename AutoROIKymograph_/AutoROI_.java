@@ -1,7 +1,4 @@
-import Required.Graph;
-import Required.ImageInfo;
-import Required.ImageShredder;
-import Required.Node;
+import Required.*;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -16,15 +13,15 @@ import ij.process.ImageProcessor;
 
 import java.util.ArrayList;
 
-public class Test_ implements PlugInFilter{
+public class AutoROI_ implements PlugInFilter{
 
         /*************
          * Variables *
          *************/
-    protected ImagePlus image = null;
+    protected ImagePlus image;
     private RoiManager roiManager;
 
-    private ImageInfo imageInfo = null;
+    private ImageInfo imageInfo;
     private double minValue = Prefs.get("AutoROI_minVal.double", 50.0);                 // Minimal intensity value of the pixel
     private double maxValue = Prefs.get("AutoROI_maxVal.double", 150.0);                // Maximal intensity value of the pixel
     private int searchLength = (int) Prefs.get("AutoROI_searchLgt.double", 30.0);       // Length of search on the next line
