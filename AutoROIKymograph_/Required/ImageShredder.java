@@ -8,7 +8,7 @@ import ij.plugin.frame.RoiManager;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ImageShredder extends Thread{
+public class ImageShredder/* extends Thread*/{
 
         /*************
          * Variables *
@@ -135,20 +135,17 @@ public class ImageShredder extends Thread{
 
                 if(tmp.isEmpty()){
 
-                    Point tmpP = new Point(k, y, null);
-                    tmp.add(tmpP);
+                    tmp.add(new Point(k, y, null));
                 }
                 else{
 
-                    if((k - tmp.get(tmp.size() - 1).x) > this.subSearchLgth){
+                    if((k - tmp.get(tmp.size() - 1).x) >= this.subSearchLgth){
 
-                        Point tmpP = new Point(k, y, null);
-                        tmp.add(tmpP);
+                        tmp.add(new Point(k, y, null));
                     }
                     else if(this.pixels[tmp.get(tmp.size() - 1).x + y*this.imageInfo.width] < value){
 
-                        Point tmpP = new Point(k, y, null);
-                        tmp.set(tmp.size() - 1, tmpP);
+                        tmp.set(tmp.size() - 1, new Point(k, y, null));
                     }
                 }
             }
