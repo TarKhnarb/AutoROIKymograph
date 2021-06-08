@@ -5,8 +5,8 @@ public class Range<E extends Number>{
         /*************
          * Variables *
          *************/
-    private final E min;
-    private final E max;
+    private E min;
+    private E max;
 
         /****************
          * Constructors *
@@ -23,6 +23,11 @@ public class Range<E extends Number>{
         this.max = range.getMax();
     }
 
+    public void setMin(E min){
+
+        this.min = min;
+    }
+
         /**********
          * GetMin *
          **********/
@@ -31,12 +36,23 @@ public class Range<E extends Number>{
         return this.min;
     }
 
+    public void setMax(E max){
+
+        this.max = max;
+    }
+
         /**********
          * GetMax *
          **********/
     public E getMax(){
 
         return this.max;
+    }
+
+    public void setRange(E min, E max){
+
+        this.min = min;
+        this.max = max;
     }
 
         /************
