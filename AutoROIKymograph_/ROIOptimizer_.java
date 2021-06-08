@@ -2,7 +2,6 @@ import Required.*;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.Prefs;
 import ij.WindowManager;
 import ij.gui.GenericDialog;
 import ij.gui.ImageWindow;
@@ -11,14 +10,10 @@ import ij.process.ImageProcessor;
 
 public class ROIOptimizer_ implements PlugInFilter{
 
-        /*************
-         * Variables *
-         *************/
+        /************
+         * Variable *
+         ************/
     protected ImagePlus image;
-    private ImageInfo imageInfo;
-    private double minValue = Prefs.get("ROIOpt_minVal.double", 50.0);                 // Minimal intensity value of the pixel
-    private double maxValue = Prefs.get("ROIOpt_maxVal.double", 150.0);                // Maximal intensity value of the pixel
-    private int subSearchLength = (int) Prefs.get("ROIOpt_subSearchLgt.double", 2.0);  // Minimal length (in px) between two higher pixel value
 
         /*******
          * Run *
@@ -31,16 +26,16 @@ public class ROIOptimizer_ implements PlugInFilter{
             this.image = WindowManager.getCurrentImage();
         }
 
-        this.imageInfo = new ImageInfo(image);
+        ImageInfo imageInfo = new ImageInfo(image);
 
         GenericDialog dialog = new GenericDialog("AutoROI");
 
         dialog.addMessage("Please select the intensity range to be processed:");
-        dialog.addSlider("Min value", 0.0, 255.0, 50.0, 0.1);
-        dialog.addSlider("Max value", 0.0, 255.0, 150.0, 0.1);
+        dialog.addSlider("Min value", 0.0, 255.0, 15.0, 0.1);
+        dialog.addSlider("Max value", 0.0, 255.0, 255.0, 0.1);
 
         dialog.addMessage("Please set the maximal speed of a particle");
-        dialog.addSlider("Minimal length between two found points", 2.0, this.imageInfo.width, 2.0, 1.0);
+        dialog.addSlider("Minimal length between two found points", 2.0, imageInfo.width, 2.0, 1.0);
 
         dialog.addMessage("Image to be process");
         dialog.addImage(this.image);
@@ -52,24 +47,21 @@ public class ROIOptimizer_ implements PlugInFilter{
             return;
         }
 
-        this.minValue = dialog.getNextNumber();
-        this.maxValue = dialog.getNextNumber();
-        this.subSearchLength = (int) dialog.getNextNumber();
-
-            // Save preset
-        Prefs.set("ROIOpt_minVal.double", this.minValue);
-        Prefs.set("ROIOpt_maxVal.double", this.maxValue);
-        Prefs.set("ROIOpt_subSearchLgt.double", this.subSearchLength);
+        double minValue = dialog.getNextNumber();               // Minimal intensity value of the pixel
+        double maxValue = dialog.getNextNumber();               // Maximal intensity value of the pixel
+        int subSearchLength = (int) dialog.getNextNumber();     // Minimal length (in px) between two higher pixel value
 
         if(dialog.wasOKed()){   // Running process
 
-            if(this.maxValue <= this.minValue){     // Principe of an interval
+            if(maxValue <= minValue){     // Principe of an interval
 
                 IJ.error("Test_OutOfRange", "minValue and maxValue should be strictly less and greater than each other respectively");
             }
 
-            PreShredder test = new PreShredder(this.image, this.minValue, this.maxValue, this.subSearchLength, this.imageInfo);
+            ROIOptimizer test = new ROIOptimizer(this.image.duplicate(), minValue, maxValue, subSearchLength, imageInfo);
             WindowManager.setCurrentWindow(new ImageWindow(test.getProcess()));
+            WindowManager.setCurrentWindow(new ImageWindow(test.getProcessRL()));
+            WindowManager.setCurrentWindow(new ImageWindow(test.getProcessLR()));
         }
     }
 
