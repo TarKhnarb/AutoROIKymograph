@@ -22,10 +22,10 @@ public class AutoROI_ implements PlugInFilter{
     private RoiManager roiManager;
 
     private ImageInfo imageInfo;
-    private double minValue = Prefs.get("AutoROI_minVal.double", 50.0);                 // Minimal intensity value of the pixel
-    private double maxValue = Prefs.get("AutoROI_maxVal.double", 150.0);                // Maximal intensity value of the pixel
+    private double minValue = Prefs.get("AutoROI_minVal.double", 15.0);                 // Minimal intensity value of the pixel
+    private double maxValue = Prefs.get("AutoROI_maxVal.double", 255.0);                // Maximal intensity value of the pixel
     private int searchLength = (int) Prefs.get("AutoROI_searchLgt.double", 30.0);       // Length of search on the next line
-    private int subSearchLength = (int) Prefs.get("AutoROI_subSearchLgt.double", 2.0);  // Minimal length (in px) between two higher pixel value
+    private int subSearchLength = (int) Prefs.get("AutoROI_subSearchLgt.double", 6.0);  // Minimal length (in px) between two higher pixel value
 
         /*******
          * Run *
@@ -35,7 +35,7 @@ public class AutoROI_ implements PlugInFilter{
 
         if(WindowManager.getImageCount() != 0){
 
-            this.image = WindowManager.getCurrentImage();
+            this.image = WindowManager.getCurrentImage().duplicate();
         }
 
         this.imageInfo = new ImageInfo(image);
@@ -65,12 +65,12 @@ public class AutoROI_ implements PlugInFilter{
         GenericDialog dialog = new GenericDialog("AutoROI");
 
         dialog.addMessage("Please select the intensity range to be processed:");
-        dialog.addSlider("Min value", 0.0, 255.0, 50.0, 0.1);
-        dialog.addSlider("Max value", 0.0, 255.0, 150.0, 0.1);
+        dialog.addSlider("Min value", 0.0, 255.0, this.minValue, 0.1);
+        dialog.addSlider("Max value", 0.0, 255.0, this.maxValue, 0.1);
 
         dialog.addMessage("Please set the maximal speed of a particle");
-        dialog.addSlider("Search length (px)", 1.0, this.imageInfo.width, 30, 1.0);
-        dialog.addSlider("Minimal length between two found points", 2.0, this.searchLength, 2.0, 1.0);
+        dialog.addSlider("Search length (px)", 1.0, this.imageInfo.width, this.searchLength, 1.0);
+        dialog.addSlider("Minimal length between two found points", 2.0, this.searchLength, this.subSearchLength, 1.0);
 
         dialog.addMessage("Image to be process");
         dialog.addImage(this.image);
@@ -111,9 +111,9 @@ public class AutoROI_ implements PlugInFilter{
                 IJ.error("Test_OutOfRange", "subSearchLength and searchLength should be strictly less and greater than each other respectively");
             }
 
-            ImageShredder imageShredder = new ImageShredder(this.image, this.minValue, this.maxValue, this.searchLength, this.subSearchLength, this.imageInfo, this.roiManager);
-            imageShredder.processImage();
-            processResults(imageShredder.getFinalPaths());
+            AutoROI autoROI = new AutoROI(this.image, this.minValue, this.maxValue, this.searchLength, this.subSearchLength, this.imageInfo, this.roiManager);
+            autoROI.processImage();
+            processResults(autoROI.getFinalPaths());
         }
     }
 

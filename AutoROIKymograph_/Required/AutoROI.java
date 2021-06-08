@@ -8,7 +8,7 @@ import ij.plugin.frame.RoiManager;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ImageShredder/* extends Thread*/{
+public class AutoROI/* extends Thread*/{
 
         /*************
          * Variables *
@@ -27,7 +27,7 @@ public class ImageShredder/* extends Thread*/{
         /***************
          * Constructor *
          ***************/
-    public ImageShredder(ImagePlus image, double minIntensity, double maxIntensity, int searchLength, int subSearchLgth, ImageInfo imageInfo, RoiManager roiManager){
+    public AutoROI(ImagePlus image, double minIntensity, double maxIntensity, int searchLength, int subSearchLgth, ImageInfo imageInfo, RoiManager roiManager){
 
         this.image = image;
         this.intensity = new Range<>(minIntensity, maxIntensity);
