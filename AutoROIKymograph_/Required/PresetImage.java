@@ -66,7 +66,7 @@ public class PresetImage implements PlugIn{
                     return;
                 }
 
-                fc.setMultiSelectionEnabled(true);
+                fc.setMultiSelectionEnabled(false);
                 if(dir == null){
 
                     String subDir = OpenDialog.getDefaultDirectory();

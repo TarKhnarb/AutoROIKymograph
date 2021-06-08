@@ -11,6 +11,7 @@ public class ImageInfo{
     public final int width;
     public final int height;
     public final int type;
+    public final String name;
 
         /***************
          * Constructor *
@@ -21,5 +22,6 @@ public class ImageInfo{
         this.width = image.getWidth();
         this.height = image.getHeight();
         this.type = image.getType();
+        this.name = image.getTitle();
     }
 }

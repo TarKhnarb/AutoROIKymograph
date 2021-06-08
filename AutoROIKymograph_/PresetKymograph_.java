@@ -51,7 +51,7 @@ public class PresetKymograph_ extends PlugInFrame{
             return;
         }
 
-        this.imageRef = WindowManager.getCurrentImage();
+        this.imageRef = WindowManager.getCurrentImage().duplicate();
         this.buttonAdd = new JButton("Add operation");
         this.buttonAdd.setSize(30, 15);
         this.buttonQuit = new JButton("Quit");
@@ -71,7 +71,7 @@ public class PresetKymograph_ extends PlugInFrame{
             if(this.buttonAdd.isEnabled()){
 
                 this.imageRef = WindowManager.getCurrentImage();
-                new PresetKymograph().run(this.imageRef.getProcessor());
+                new PresetKymograph().run(this.imageRef.getProcessor().duplicate());
 
             }
         });
